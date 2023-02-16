@@ -1,0 +1,8 @@
+.idea
+.npmrc
+/doc
+/lib
+node_modules/
+package-lock.json
+*.log
+*.log.*
