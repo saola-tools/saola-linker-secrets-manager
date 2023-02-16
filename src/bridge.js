@@ -4,6 +4,8 @@ const Devebot = require("@saola/core");
 const Promise = Devebot.require("bluebird");
 const lodash = Devebot.require("lodash");
 
+const { Mutex } = require("./helper");
+
 const {
   SecretsManagerClient,
   GetSecretValueCommand,
@@ -13,6 +15,8 @@ function Service (params = {}) {
   const { region, secretId, defaultOnErrors, defaultValue } = params;
   //
   this._context_ = {};
+  this._sandbox_ = new Mutex();
+  this._secrets_ = {};
   //
   let args = {};
   if (lodash.isString(region)) {
@@ -34,7 +38,34 @@ function Service (params = {}) {
 }
 
 Service.prototype.getSecretValue = function(options = {}) {
-  return getSecretValue.bind(this)(options);
+  return getCachedSecretValue.bind(this)(options);
+}
+
+function getCachedSecretValue (options = {}) {
+  const that = this;
+  const context = that._context_;
+  const sandbox = that._sandbox_;
+  //
+  const secretId = options.secretId || context.secretId;
+  //
+  return new Promise(function(resolve, reject) {
+    sandbox.lock(function() {
+      if (that._secrets_[secretId]) {
+        resolve(that._secrets_[secretId]);
+        sandbox.unlock();
+        return;
+      }
+      let get = Promise.resolve(getSecretValue.bind(that)(options));
+      get.then(function onResolved(result) {
+        that._secrets_[secretId] = result;
+        resolve(that._secrets_[secretId]);
+        sandbox.unlock();
+      }, function onRejected(error) {
+        reject(error);
+        sandbox.unlock();
+      });
+    });
+  });
 }
 
 function getSecretValue (options = {}) {

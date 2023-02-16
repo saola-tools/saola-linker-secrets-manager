@@ -41,8 +41,8 @@
     "@saola/core": "^0.4.0"
   },
   "dependencies": {
-    "@saola/core": "^0.4.0",
-    "@aws-sdk/client-secrets-manager": "^3.267.0"
+    "@aws-sdk/client-secrets-manager": "^3.267.0",
+    "@saola/core": "^0.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",

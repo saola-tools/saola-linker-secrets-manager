@@ -1,6 +1,11 @@
 "use strict";
 
-const { assert } = require("chai");
+const Devebot = require("@saola/core");
+const Promise = Devebot.require("bluebird");
+const lodash = Devebot.require("lodash");
+const { assert } = require("liberica");
+
+const lab = require("../index");
 
 describe("bdd:saola-linker-aws-secrets-manager:client", function() {
   let app;
@@ -14,9 +19,27 @@ describe("bdd:saola-linker-aws-secrets-manager:client", function() {
     //
     let p = Promise.resolve(exampleService.getDocumentDbConfig());
     //
-    p = p.then(function(connection) {
-        console.log(JSON.stringify(connection, null, 2));
-      // assert.equal(connection.readyState, 1);
+    let expected = {
+      "value": {
+        "username": "admin",
+        "password": "12345678",
+        "host": "127.0.0.1",
+        "port": 27017
+      },
+      "status": 1
+    };
+    //
+    p = p.then(function(connParams) {
+        false && console.log(JSON.stringify(connParams, null, 2));
+        if (lab.isCloudSetup()) {
+          assert.equal(lodash.get(connParams, ["status"]), 0);
+          assert.equal(lodash.get(connParams, ["extra", "Name"]), lab.getSecretIdOf("documentdb"));
+          assert.isObject(lodash.get(connParams, "value"));
+          assert.isObject(lodash.get(connParams, ["extra", "$metadata"]));
+          assert.isString(lodash.get(connParams, ["extra", "ARN"]));
+        } else {
+          assert.deepEqual(connParams, expected);
+        }
     });
     //
     return p;

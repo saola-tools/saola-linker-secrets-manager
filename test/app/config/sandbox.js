@@ -1,7 +1,7 @@
 "use strict";
 
 const { BYPASSED_ERRORS } = require("../../../lib/helper");
-const SECRET_ID_PREFIX = "beta/example/";
+const lab = require("../../index");
 
 module.exports = {
   bridges: {
@@ -9,13 +9,13 @@ module.exports = {
       application: {
         documentDbConfig: {
           region: "ap-southeast-1",
-          secretId: SECRET_ID_PREFIX + "documentdb",
+          secretId: lab.getSecretIdOf("documentdb"),
           defaultOnErrors: BYPASSED_ERRORS,
           defaultValue: {}
         },
         openSearchConfig: {
           region: "ap-southeast-1",
-          secretId: SECRET_ID_PREFIX + "opensearch",
+          secretId: lab.getSecretIdOf("opensearch"),
           defaultOnErrors: [ "ResourceNotFoundException" ],
           defaultValue: {
             host: "localhost",
@@ -24,7 +24,7 @@ module.exports = {
         },
         jsonWebTokenKeys: {
           region: "ap-southeast-1",
-          secretId: SECRET_ID_PREFIX + "jsonwebtoken",
+          secretId: lab.getSecretIdOf("jsonwebtoken"),
         },
       }
     }
