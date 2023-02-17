@@ -1,8 +1,8 @@
 "use strict";
 
-const Devebot = require("@saola/core");
-const Promise = Devebot.require("bluebird");
-const lodash = Devebot.require("lodash");
+const Core = require("@saola/core");
+const Promise = Core.require("bluebird");
+const lodash = Core.require("lodash");
 
 const { Mutex } = require("./helper");
 
@@ -38,15 +38,18 @@ function Service (params = {}) {
 }
 
 Service.prototype.getSecretValue = function(options = {}) {
-  return getCachedSecretValue.bind(this)(options);
+  return getCachedSecretValue(options, this);
 }
 
-function getCachedSecretValue (options = {}) {
-  const that = this;
+function getCachedSecretValue (options = {}, self = {}) {
+  const that = this || self;
   const context = that._context_;
   const sandbox = that._sandbox_;
   //
   const secretId = options.secretId || context.secretId;
+  if (that._secrets_[secretId]) {
+    return Promise.resolve(that._secrets_[secretId]);
+  }
   //
   return new Promise(function(resolve, reject) {
     sandbox.lock(function() {
@@ -55,7 +58,7 @@ function getCachedSecretValue (options = {}) {
         sandbox.unlock();
         return;
       }
-      let get = Promise.resolve(getSecretValue.bind(that)(options));
+      let get = Promise.resolve(getSecretValue(options, that));
       get.then(function onResolved(result) {
         that._secrets_[secretId] = result;
         resolve(that._secrets_[secretId]);
@@ -68,8 +71,9 @@ function getCachedSecretValue (options = {}) {
   });
 }
 
-function getSecretValue (options = {}) {
-  const context = this._context_ || {};
+function getSecretValue (options = {}, self = {}) {
+  const that = this || self;
+  const context = that._context_ || {};
   const { client, defaultOnErrors } = context;
   //
   const secretId = options.secretId || context.secretId;
