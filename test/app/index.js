@@ -4,7 +4,7 @@ var app = require("@saola/core").launchApplication({
   appRootPath: __dirname
 }, [], [
   {
-    name: "@saola/linker-aws-secrets-manager",
+    name: "@saola/linker-secrets-manager",
     path: require("path").join(__dirname, "../../index.js")
   }
 ]);

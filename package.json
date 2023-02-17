@@ -1,7 +1,7 @@
 {
-  "name": "@saola/linker-aws-secrets-manager",
+  "name": "@saola/linker-secrets-manager",
   "version": "0.4.0",
-  "description": "Saola (-co-) AWS Secrets Manager",
+  "description": "Saola (-co-) Secrets Manager",
   "main": "index.js",
   "directories": {
     "lib": "lib/"
@@ -11,7 +11,6 @@
   },
   "files": [
     "bin/",
-    "data/",
     "lib/"
   ],
   "scripts": {
@@ -30,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/saola-tools/saola-linker-aws-secrets-manager.git"
+    "url": "git+https://github.com/saola-tools/saola-linker-secrets-manager.git"
   },
   "keywords": [
     "saola",

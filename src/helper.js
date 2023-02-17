@@ -12,16 +12,16 @@ const BYPASSED_ERRORS = [
   "InvalidSignatureException",
 ];
 
-function Mutex() {
+function Mutex () {
   this._silo_ = {
     isLocked: false,
     queue: []
-  }
+  };
 }
 
 Mutex.prototype.isNumber = function(val) {
-  return (typeof val === 'number');
-}
+  return (typeof val === "number");
+};
 
 Mutex.prototype.tryLock = function () {
   if (this._silo_.isLocked) {
@@ -39,7 +39,7 @@ Mutex.prototype.lock = function (cb, ttl) {
       let that = this;
       let timer = setTimeout(function () {
         if (cb) {
-          cb.call(this, new Error('Lock timed out'));
+          cb.call(this, new Error("Lock timed out"));
           cb = null;
         }
       }, ttl);
@@ -60,7 +60,7 @@ Mutex.prototype.lock = function (cb, ttl) {
 
 Mutex.prototype.unlock = function () {
   if (!this._silo_.isLocked) {
-    throw new Error('Mutex is not locked');
+    throw new Error("Mutex is not locked");
   }
 
   let waiter = this._silo_.queue.shift();
@@ -72,7 +72,7 @@ Mutex.prototype.unlock = function () {
   }
 };
 
-Object.defineProperty(Mutex.prototype, 'isLocked', {
+Object.defineProperty(Mutex.prototype, "isLocked", {
   get: function () {
     return this._silo_.isLocked;
   }

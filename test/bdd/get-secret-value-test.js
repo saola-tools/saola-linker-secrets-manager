@@ -7,7 +7,7 @@ const { assert } = require("liberica");
 
 const lab = require("../index");
 
-describe("bdd:saola-linker-aws-secrets-manager:client", function() {
+describe("bdd:saola-linker-secrets-manager:client", function() {
   let app;
   //
   before(function() {

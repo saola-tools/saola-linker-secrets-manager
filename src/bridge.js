@@ -39,7 +39,7 @@ function Service (params = {}) {
 
 Service.prototype.getSecretValue = function(options = {}) {
   return getCachedSecretValue(options, this);
-}
+};
 
 function getCachedSecretValue (options = {}, self = {}) {
   const that = this || self;
@@ -59,11 +59,11 @@ function getCachedSecretValue (options = {}, self = {}) {
         return;
       }
       let get = Promise.resolve(getSecretValue(options, that));
-      get.then(function onResolved(result) {
+      get.then(function onResolved (result) {
         that._secrets_[secretId] = result;
         resolve(that._secrets_[secretId]);
         sandbox.unlock();
-      }, function onRejected(error) {
+      }, function onRejected (error) {
         reject(error);
         sandbox.unlock();
       });

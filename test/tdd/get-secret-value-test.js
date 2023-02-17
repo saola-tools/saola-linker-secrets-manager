@@ -10,7 +10,7 @@ const { assert, rewire, sinon } = require("liberica");
 
 const lab = require("../index");
 
-describe("tdd:saola-linker-aws-secrets-manager:client", function() {
+describe("tdd:saola-linker-secrets-manager:client", function() {
   const Bridge = rewire(path.join(__dirname, "../../lib/bridge"));
 
   it("display the real client-secrets-manager.getSecretValue", function() {
@@ -129,6 +129,55 @@ describe("tdd:saola-linker-aws-secrets-manager:client", function() {
         client.getSecretValue({ secretId: lab.getSecretIdOf("documentdb") }),
         client.getSecretValue({ secretId: lab.getSecretIdOf("jsonwebtoken") }),
       ])
+      //
+      p = p.then(function(secrets) {
+        false && console.info(JSON.stringify(secrets, null, 2));
+        false && console.log("count: %s", getSecretValue.callCount);
+        assert.equal(getSecretValue.callCount, 2);
+      });
+      //
+      return p;
+    });
+  });
+  //
+  it("the getSecretValue() must be supported to execute asynchronously", function() {
+    const getSecretValue = sinon.spy(Bridge.__get__("getSecretValue"));
+    const setupSpace = Bridge.__with__({ getSecretValue });
+    //
+    return setupSpace(function() {
+      const client = new Bridge();
+      if (!lab.isCloudSetup()) {
+        client._context_.client = {
+          send: function() {
+            return Promise.resolve({
+              "$metadata": {
+                "httpStatusCode": 200,
+                "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
+                "attempts": 1,
+                "totalRetryDelay": 0
+              },
+              "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
+              "CreatedDate": "2021-02-12T11:07:34.233Z",
+              "Name": "xxx/yyy/zzz",
+              "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
+              "VersionStages": [
+                "AWSCURRENT"
+              ],
+              "SecretString": JSON.stringify({
+                "secretKey": "changeme",
+                "deprecatedKeys": "invalid,deprecated"
+              })
+            });
+          }
+        }
+      }
+      //
+      let p = Promise.map(lodash.range(1000), function(i) {
+        if (i % 11 === 0) {
+          return client.getSecretValue({ secretId: lab.getSecretIdOf("jsonwebtoken") });
+        }
+        return client.getSecretValue({ secretId: lab.getSecretIdOf("documentdb") });
+      });
       //
       p = p.then(function(secrets) {
         false && console.info(JSON.stringify(secrets, null, 2));

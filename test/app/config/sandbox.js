@@ -5,7 +5,7 @@ const lab = require("../../index");
 
 module.exports = {
   bridges: {
-    awsSecretsManager: {
+    secretsManager: {
       application: {
         documentDbConfig: {
           region: "ap-southeast-1",
