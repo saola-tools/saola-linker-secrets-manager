@@ -41,7 +41,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
                 "secretKey": "changeme",
                 "deprecatedKeys": "invalid,deprecated"
               })
-            });
+            }).delay(lodash.random(10, 30));
           }
         }
       }

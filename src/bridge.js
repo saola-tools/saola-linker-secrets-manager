@@ -38,6 +38,11 @@ function Service (params = {}) {
 }
 
 Service.prototype.getSecretValue = function(options = {}) {
+  if (options.isRefreshing) {
+    return resetCachedSecretValue(options, this).then(function() {
+      return getCachedSecretValue(options, this);
+    });
+  }
   return getCachedSecretValue(options, this);
 };
 
@@ -80,14 +85,22 @@ function resetCachedSecretValue (options = {}, self = {}) {
   const sandbox = that._sandbox_;
   //
   const secretId = options.secretId || context.secretId;
-  if (isNil(that._secrets_[secretId])) {
+  if (secretId && secretId != "*" && isNil(that._secrets_[secretId])) {
     return Promise.resolve();
   }
   //
   return new Promise(function(resolve, reject) {
     sandbox.lock(function() {
-      that._secrets_[secretId] = undefined;
-      delete that._secrets_[secretId];
+      if (that._secrets_.hasOwnProperty(secretId)) {
+        delete that._secrets_[secretId];
+      }
+      if (secretId == "*") {
+        for (let id in that._secrets_) {
+          if (that._secrets_.hasOwnProperty(id)) {
+            delete that._secrets_[id];
+          }
+        }
+      }
       resolve();
       sandbox.unlock();
     });
