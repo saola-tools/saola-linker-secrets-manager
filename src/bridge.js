@@ -41,6 +41,10 @@ Service.prototype.getSecretValue = function(options = {}) {
   return getCachedSecretValue(options, this);
 };
 
+Service.prototype.reset = function(options = {}) {
+  return resetCachedSecretValue(options, this);
+};
+
 function getCachedSecretValue (options = {}, self = {}) {
   const that = this || self;
   const context = that._context_;
@@ -58,8 +62,7 @@ function getCachedSecretValue (options = {}, self = {}) {
         sandbox.unlock();
         return;
       }
-      let get = Promise.resolve(getSecretValue(options, that));
-      get.then(function onResolved (result) {
+      getSecretValue(options, that).then(function onResolved (result) {
         that._secrets_[secretId] = result;
         resolve(that._secrets_[secretId]);
         sandbox.unlock();
@@ -71,8 +74,32 @@ function getCachedSecretValue (options = {}, self = {}) {
   });
 }
 
-function getSecretValue (options = {}, self = {}) {
+function resetCachedSecretValue (options = {}, self = {}) {
   const that = this || self;
+  const context = that._context_;
+  const sandbox = that._sandbox_;
+  //
+  const secretId = options.secretId || context.secretId;
+  if (isNil(that._secrets_[secretId])) {
+    return Promise.resolve();
+  }
+  //
+  return new Promise(function(resolve, reject) {
+    sandbox.lock(function() {
+      that._secrets_[secretId] = undefined;
+      delete that._secrets_[secretId];
+      resolve();
+      sandbox.unlock();
+    });
+  });
+}
+
+function isNil (v) {
+  return v == null || v == undefined;
+}
+
+function getSecretValue (options = {}, self = {}) {
+  const that = this || self || {};
   const context = that._context_ || {};
   const { client, defaultOnErrors } = context;
   //
