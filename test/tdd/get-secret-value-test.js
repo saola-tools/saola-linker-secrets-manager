@@ -34,25 +34,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       const client = new Bridge();
       client._context_.client = {
         send: function() {
-          return Promise.resolve({
-            "$metadata": {
-              "httpStatusCode": 200,
-              "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
-              "attempts": 1,
-              "totalRetryDelay": 0
-            },
-            "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
-            "CreatedDate": "2021-02-12T11:07:34.233Z",
-            "Name": "xxx/yyy/zzz",
-            "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
-            "VersionStages": [
-              "AWSCURRENT"
-            ],
-            "SecretString": JSON.stringify({
-              "secretKey": "changeme",
-              "deprecatedKeys": "invalid,deprecated"
-            })
-          });
+          return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]);
         }
       }
       //
@@ -60,25 +42,8 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       //
       const expected = {
         "status": 0,
-        "value": {
-          "secretKey": "changeme",
-          "deprecatedKeys": "invalid,deprecated"
-        },
-        "extra": {
-          "$metadata": {
-            "httpStatusCode": 200,
-            "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
-            "attempts": 1,
-            "totalRetryDelay": 0
-          },
-          "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
-          "CreatedDate": "2021-02-12T11:07:34.233Z",
-          "Name": "xxx/yyy/zzz",
-          "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
-          "VersionStages": [
-            "AWSCURRENT"
-          ]
-        }
+        "value": JSON.parse(lodash.get(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"], ["SecretString"])),
+        "extra": lodash.omit(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"], ["SecretString"])
       };
       //
       p = p.then(function(secret) {
@@ -99,25 +64,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       if (!lab.isCloudSetup()) {
         client._context_.client = {
           send: function() {
-            return Promise.resolve({
-              "$metadata": {
-                "httpStatusCode": 200,
-                "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
-                "attempts": 1,
-                "totalRetryDelay": 0
-              },
-              "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
-              "CreatedDate": "2021-02-12T11:07:34.233Z",
-              "Name": "xxx/yyy/zzz",
-              "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
-              "VersionStages": [
-                "AWSCURRENT"
-              ],
-              "SecretString": JSON.stringify({
-                "secretKey": "changeme",
-                "deprecatedKeys": "invalid,deprecated"
-              })
-            });
+            return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]);
           }
         }
       }
@@ -149,25 +96,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       if (!lab.isCloudSetup()) {
         client._context_.client = {
           send: function() {
-            return Promise.resolve({
-              "$metadata": {
-                "httpStatusCode": 200,
-                "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
-                "attempts": 1,
-                "totalRetryDelay": 0
-              },
-              "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
-              "CreatedDate": "2021-02-12T11:07:34.233Z",
-              "Name": "xxx/yyy/zzz",
-              "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
-              "VersionStages": [
-                "AWSCURRENT"
-              ],
-              "SecretString": JSON.stringify({
-                "secretKey": "changeme",
-                "deprecatedKeys": "invalid,deprecated"
-              })
-            }).delay(lodash.random(10, 30));
+            return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]).delay(lodash.random(10, 30));
           }
         }
       }
@@ -189,3 +118,49 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
     });
   });
 });
+
+const SAMPLE_SECRET_VALUE_OF = {
+  documentdb: {
+    "$metadata": {
+      "httpStatusCode": 200,
+      "requestId": "9bcd9653-c1d3-4349-8ac5-b514433dd1f5",
+      "attempts": 1,
+      "totalRetryDelay": 0
+    },
+    "ARN": "arn:aws:secretsmanager:ap-southeast-1:112233445566:secret:beta/example/documentdb-RCf000",
+    "CreatedDate": "2022-03-12T12:26:27.202Z",
+    "Name": "beta/example/documentdb",
+    "VersionId": "51840cd8-6986-49fb-aa00-2e9151fb4cdd",
+    "VersionStages": [
+      "AWSCURRENT"
+    ],
+    "SecretString": JSON.stringify({
+      "username": "admin",
+      "password": "Zaq!23EdcX",
+      "engine": "mongo",
+      "host": "beta-mongodb.cluster-xyz1234abcd.ap-southeast-1.docdb.amazonaws.com",
+      "port": 27017,
+      "ssl": false,
+      "dbClusterIdentifier": "beta-mongodb"
+    })
+  },
+  jsonwebtoken: {
+    "$metadata": {
+      "httpStatusCode": 200,
+      "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
+      "attempts": 1,
+      "totalRetryDelay": 0
+    },
+    "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
+    "CreatedDate": "2021-02-12T11:07:34.233Z",
+    "Name": "xxx/yyy/zzz",
+    "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
+    "VersionStages": [
+      "AWSCURRENT"
+    ],
+    "SecretString": JSON.stringify({
+      "secretKey": "changeme",
+      "deprecatedKeys": "invalid,deprecated"
+    })
+  }
+};
