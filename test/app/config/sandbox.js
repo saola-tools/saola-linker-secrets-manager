@@ -25,6 +25,11 @@ module.exports = {
         jsonWebTokenKeys: {
           region: "ap-southeast-1",
           secretId: lab.getSecretIdOf("jsonwebtoken"),
+          versionStage: "AWSPREVIOUS",
+          defaultOnErrors: ["*"],
+          defaultValue: {
+            secretKey: "change-me-immediately"
+          },
         },
       }
     }

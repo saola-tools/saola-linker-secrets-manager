@@ -12,7 +12,7 @@ const {
 } = require("@aws-sdk/client-secrets-manager");
 
 function Service (params = {}) {
-  const { region, secretId, defaultOnErrors, defaultValue } = params;
+  const { region, secretId, versionId, versionStage, defaultOnErrors, defaultValue } = params;
   //
   this._context_ = {};
   this._sandbox_ = new Mutex();
@@ -26,6 +26,14 @@ function Service (params = {}) {
   //
   if (lodash.isString(secretId)) {
     this._context_.secretId = secretId;
+  }
+  //
+  if (lodash.isString(versionId)) {
+    this._context_.versionId = versionId;
+  }
+  //
+  if (lodash.isString(versionStage)) {
+    this._context_.versionStage = versionStage;
   }
   //
   if (lodash.isArray(defaultOnErrors)) {
@@ -117,19 +125,20 @@ function getSecretValue (options = {}, self = {}) {
   const { client, defaultOnErrors } = context;
   //
   const secretId = options.secretId || context.secretId;
-  const defaultValue = options.defaultValue || context.defaultValue;
-  const versionStage = options.versionStage || context.versionStage;
   const versionId = options.versionId || context.versionId;
+  const versionStage = options.versionStage || context.versionStage;
+  const defaultValue = options.defaultValue || context.defaultValue;
   //
   const transformer = lodash.isFunction(options.transformer) ? options.transformer : lodash.identity;
   //
   let p = Promise.resolve().then(function() {
     const args = {
       SecretId: secretId,
-      VersionStage: versionStage || "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
     };
     if (lodash.isString(versionId)) {
       args.VersionId = versionId;
+    } else {
+      args.VersionStage = versionStage || "AWSCURRENT"; // VersionStage defaults to AWSCURRENT if unspecified
     }
     return client.send(new GetSecretValueCommand(args));
   });

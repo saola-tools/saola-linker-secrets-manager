@@ -44,4 +44,32 @@ describe("bdd:saola-linker-secrets-manager:client", function() {
     //
     return p;
   });
+
+  it("getSandboxService().getJsonWebTokenKeys()", function() {
+    const exampleService = app.runner.getSandboxService("application/example");
+    //
+    let p = Promise.resolve(exampleService.getJsonWebTokenKeys());
+    //
+    let expected = {
+      "value": {
+        "secretKey": "change-me-immediately"
+      },
+      "status": 1
+    };
+    //
+    p = p.then(function(connParams) {
+        false && console.log(JSON.stringify(connParams, null, 2));
+        if (lab.isCloudSetup()) {
+          assert.equal(lodash.get(connParams, ["status"]), 0);
+          assert.equal(lodash.get(connParams, ["extra", "Name"]), lab.getSecretIdOf("jsonwebtoken"));
+          assert.isObject(lodash.get(connParams, "value"));
+          assert.isObject(lodash.get(connParams, ["extra", "$metadata"]));
+          assert.isString(lodash.get(connParams, ["extra", "ARN"]));
+        } else {
+          assert.deepEqual(connParams, expected);
+        }
+    });
+    //
+    return p;
+  });
 });

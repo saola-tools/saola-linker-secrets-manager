@@ -34,7 +34,7 @@ const Service = function(params = {}) {
 Service.referenceHash = {
   documentDbConfigClient: "application/secretsManager#documentDbConfig",
   openSearchConfigClient: "application/secretsManager#openSearchConfig",
-  jsonWebTokenKeysClient: "application/secretsManager#jsonWebTokenKeys"
+  jsonWebTokenKeysClient: "application/secretsManager#jsonWebTokenKeys",
 };
 
 module.exports = Service;

@@ -20,6 +20,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
     const client = new Bridge();
     return client.getSecretValue({
       secretId: lab.getSecretIdOf("jsonwebtoken"),
+      versionId: "6d2becc6-1aec-4446-a303-8ffadc81d541",
       defaultValue: {},
     }).then(function(secret) {
       true && console.info(JSON.stringify(secret, null, 2));
@@ -34,7 +35,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       const client = new Bridge();
       client._context_.client = {
         send: function() {
-          return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]);
+          return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]["AWSCURRENT"]);
         }
       }
       //
@@ -42,8 +43,8 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       //
       const expected = {
         "status": 0,
-        "value": JSON.parse(lodash.get(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"], ["SecretString"])),
-        "extra": lodash.omit(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"], ["SecretString"])
+        "value": JSON.parse(lodash.get(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]["AWSCURRENT"], ["SecretString"])),
+        "extra": lodash.omit(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]["AWSCURRENT"], ["SecretString"])
       };
       //
       p = p.then(function(secret) {
@@ -64,7 +65,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       if (!lab.isCloudSetup()) {
         client._context_.client = {
           send: function() {
-            return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]);
+            return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]["AWSCURRENT"]);
           }
         }
       }
@@ -96,7 +97,7 @@ describe("tdd:saola-linker-secrets-manager:client", function() {
       if (!lab.isCloudSetup()) {
         client._context_.client = {
           send: function() {
-            return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]).delay(lodash.random(10, 30));
+            return Promise.resolve(SAMPLE_SECRET_VALUE_OF["jsonwebtoken"]["AWSCURRENT"]).delay(lodash.random(10, 30));
           }
         }
       }
@@ -145,22 +146,43 @@ const SAMPLE_SECRET_VALUE_OF = {
     })
   },
   jsonwebtoken: {
-    "$metadata": {
-      "httpStatusCode": 200,
-      "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
-      "attempts": 1,
-      "totalRetryDelay": 0
+    AWSPREVIOUS: {
+      "$metadata": {
+        "httpStatusCode": 200,
+        "requestId": "5b13624e-9187-479c-b03e-79e3590b92cc",
+        "attempts": 1,
+        "totalRetryDelay": 0
+      },
+      "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
+      "CreatedDate": "2021-02-12T11:07:34.233Z",
+      "Name": "xxx/yyy/zzz",
+      "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
+      "VersionStages": [
+        "AWSPREVIOUS"
+      ],
+      "SecretString": JSON.stringify({
+        "secretKey": "changeme",
+        "deprecatedKeys": "invalid,deprecated"
+      })
     },
-    "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
-    "CreatedDate": "2021-02-12T11:07:34.233Z",
-    "Name": "xxx/yyy/zzz",
-    "VersionId": "6d2becc6-1aec-4446-a303-8ffadc81d541",
-    "VersionStages": [
-      "AWSCURRENT"
-    ],
-    "SecretString": JSON.stringify({
-      "secretKey": "changeme",
-      "deprecatedKeys": "invalid,deprecated"
-    })
+    AWSCURRENT: {
+      "$metadata": {
+        "httpStatusCode": 200,
+        "requestId": "98d097ad-b9dd-435a-b458-64b48a3cfbfb",
+        "attempts": 1,
+        "totalRetryDelay": 0
+      },
+      "ARN": "arn:aws:secretsmanager:ap-southeast-1:xxxxx:secret:xxx/yyy/zzz-ABCXYZ",
+      "CreatedDate": "2021-02-21T07:14:53.679Z",
+      "Name": "xxx/yyy/zzz",
+      "VersionId": "dfade4fe-ac5f-458a-9ef4-9d3cd54a9dcd",
+      "VersionStages": [
+        "AWSCURRENT"
+      ],
+      "SecretString": JSON.stringify({
+        "secretKey": "changeme",
+        "deprecatedKeys": "p4$$w0rd,deprecated"
+      })
+    }
   }
 };
